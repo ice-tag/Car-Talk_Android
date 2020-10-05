@@ -19,14 +19,25 @@ import kotlinx.android.synthetic.main.activity_setting.*
 
 
 class SettingActivity : AppCompatActivity() {
-    var push_state = 1
-    var sound_state = 1
-    var vibrate_state = 1
-
     @SuppressLint("WrongViewCast")
     override fun onCreate(savedInstanceState: Bundle?) {
+        var push_state :Int = 4
+        var sound_state :Int = 1
+        var vibrate_state :Int = 1
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_setting)
+        if(intent.hasExtra("push")) push_state = intent.getIntExtra("push",1)
+        if(intent.hasExtra("sound")) sound_state = intent.getIntExtra("sound",1)
+        if(intent.hasExtra("vibrate")) vibrate_state = intent.getIntExtra("vibrate",1)
+        if(push_state == 1){
+            button_push_alam.setChecked(true)
+        }
+        if(sound_state == 1){
+            button_sound.setChecked(true)
+        }
+        if(vibrate_state == 1){
+            button_vibrate.setChecked(true)
+        }
 
         button_push_alam.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { buttonView, isChecked -> // 스위치 버튼이 체크되었는지 검사하여 텍스트뷰에 각 경우에 맞게 출력합니다.
             if (isChecked) {
@@ -61,7 +72,7 @@ class SettingActivity : AppCompatActivity() {
             finish()
         }
 
-        button_push_alam.setOnClickListener{
+        /*button_push_alam.setOnClickListener{
             val NOTIFICATION_ID = 1001;
             createNotificationChannel(
                 this, NotificationManagerCompat.IMPORTANCE_DEFAULT,
@@ -98,7 +109,7 @@ class SettingActivity : AppCompatActivity() {
             // 소리 알람은 DEFAULT_SOUND
             val notificationManager = NotificationManagerCompat.from(this)
             notificationManager.notify(NOTIFICATION_ID, builder.build())    // 11
-        }
+        }*/
     }
 
     private fun createNotificationChannel(
