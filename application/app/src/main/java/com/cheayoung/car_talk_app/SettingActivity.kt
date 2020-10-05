@@ -1,5 +1,6 @@
 package com.cheayoung.car_talk_app
 
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -7,28 +8,65 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
+import android.widget.CompoundButton
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import kotlinx.android.synthetic.main.activity_scan.*
+import com.kyleduo.switchbutton.SwitchButton
 import kotlinx.android.synthetic.main.activity_setting.*
 
+
 class SettingActivity : AppCompatActivity() {
+    var push_state = 1
+    var sound_state = 1
+    var vibrate_state = 1
+
+    @SuppressLint("WrongViewCast")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_setting)
 
+        button_push_alam.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { buttonView, isChecked -> // 스위치 버튼이 체크되었는지 검사하여 텍스트뷰에 각 경우에 맞게 출력합니다.
+            if (isChecked) {
+                push_state = 1
+            } else {
+                push_state = 0
+            }
+        })
+
+        button_sound.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { buttonView, isChecked -> // 스위치 버튼이 체크되었는지 검사하여 텍스트뷰에 각 경우에 맞게 출력합니다.
+            if (isChecked) {
+                sound_state = 1
+            } else {
+                sound_state = 0
+            }
+        })
+
+        button_vibrate.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { buttonView, isChecked -> // 스위치 버튼이 체크되었는지 검사하여 텍스트뷰에 각 경우에 맞게 출력합니다.
+            if (isChecked) {
+                vibrate_state = 1
+            } else {
+                vibrate_state = 0
+            }
+        })
+
         go_scan_page.setOnClickListener {
             val intent = Intent(this, ScanActivity::class.java)// 다음 화면으로 이동
+            intent.putExtra("vibrate",vibrate_state)
+            intent.putExtra("push",push_state)
+            intent.putExtra("sound",sound_state)
             startActivity(intent)
             finish()
         }
 
-        buttonPush.setOnClickListener{
+        button_push_alam.setOnClickListener{
             val NOTIFICATION_ID = 1001;
-            createNotificationChannel(this, NotificationManagerCompat.IMPORTANCE_DEFAULT,
-                false, getString(R.string.app_name), "App notification channel") // 1
+            createNotificationChannel(
+                this, NotificationManagerCompat.IMPORTANCE_DEFAULT,
+                false, getString(R.string.app_name), "App notification channel"
+            ) // 1
 
             val channelId = "$packageName-${getString(R.string.app_name)}" // 2
             val title =            "Car-Talk"
@@ -36,8 +74,10 @@ class SettingActivity : AppCompatActivity() {
 
             val intent = Intent(baseContext, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            val pendingIntent = PendingIntent.getActivity(baseContext, 0,
-                intent, PendingIntent.FLAG_UPDATE_CURRENT)    // 3
+            val pendingIntent = PendingIntent.getActivity(
+                baseContext, 0,
+                intent, PendingIntent.FLAG_UPDATE_CURRENT
+            )    // 3
 
             val style = NotificationCompat.InboxStyle()
             style.addLine("Car no.1234 - Interfere")
@@ -61,8 +101,10 @@ class SettingActivity : AppCompatActivity() {
         }
     }
 
-    private fun createNotificationChannel(context: Context, importance: Int, showBadge: Boolean,
-                                          name: String, description: String) {
+    private fun createNotificationChannel(
+        context: Context, importance: Int, showBadge: Boolean,
+        name: String, description: String
+    ) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channelId = "${context.packageName}-$name"
             val channel = NotificationChannel(channelId, name, importance)

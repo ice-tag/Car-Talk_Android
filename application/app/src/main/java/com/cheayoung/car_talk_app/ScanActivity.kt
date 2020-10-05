@@ -28,9 +28,16 @@ class ScanActivity : AppCompatActivity() {
     var mScanSettings: ScanSettings.Builder? = null
     var scanFilters: MutableList<ScanFilter>? = null
     var simpleDateFormat = SimpleDateFormat("HH:mm:ss", Locale.KOREAN)
+    var push_state = 1
+    var sound_state = 1
+    var vibrate_state = 1
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scan)
+        if(intent.hasExtra("push")) push_state = intent.getIntExtra("push",1)
+        if(intent.hasExtra("sound")) sound_state = intent.getIntExtra("sound",1)
+        if(intent.hasExtra("vibrate")) vibrate_state = intent.getIntExtra("vibrate",1)
+
         ActivityCompat.requestPermissions(
             this, arrayOf<String>(
                 Manifest.permission.ACCESS_FINE_LOCATION,
@@ -76,6 +83,7 @@ class ScanActivity : AppCompatActivity() {
         setting.setOnClickListener {
             val intent = Intent(this, SettingActivity::class.java)// 다음 화면으로 이동
             startActivity(intent)
+            finish()
         }
     }
 
@@ -110,10 +118,11 @@ class ScanActivity : AppCompatActivity() {
                         var ran1 = IntRange(change.indexOf("mManufacturerSpecificData")+27, change.indexOf("mServiceData")-4)
                         var uuid_data = change.slice(ran1)
                         var data_list = uuid_data.split(",")
-
                         var ran2 = IntRange(0, data_list[0].indexOf("=")-1)
                         var start_data = uuid_data.slice(ran2)
                         var end_data : String
+                        var case_data = data_list[2]
+                        
                         try {
                             end_data = data_list[data_list.size - 1].slice(IntRange(1,3))
                         }
