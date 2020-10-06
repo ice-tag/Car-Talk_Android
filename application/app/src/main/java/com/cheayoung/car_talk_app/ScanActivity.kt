@@ -32,24 +32,7 @@ class ScanActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scan)
 
-        // 체크박스
-        button_search.setOnClickListener {
-            // 응급 알림만 수신
-            if(emergency_chk.isChecked == true){
-                if(mScanCallback.getInstance().data_list[01] == '01'){
-
-                }
-            }
-            // 사고 / 공사 알림만 수신
-            if(accident_chk.isChecked == true){
-
-            }
-            // 끼어들기 / 커브길 알림만 수신
-            if(etc_check.isChecked == true) {
-
-            }
-
-        }
+       
         // Scan
         ActivityCompat.requestPermissions(
             this, arrayOf<String>(
@@ -139,18 +122,53 @@ class ScanActivity : AppCompatActivity() {
                                 catch(e: Exception){
                                     end_data = "-1"
                                 }
-
-
+                                // 응급 알람
                                 if(start_data == "76" && end_data == "-56" && data_list.size == 23) {
-                                    beacon!!.add(
-                                        0,
-                                        Beacon(
-                                            scanResult.getDevice().getAddress(),
-                                            scanResult.getRssi(),
-                                            simpleDateFormat.format(Date()),
-                                            scanRecord!!
-                                        )
-                                    )
+                                    if(emergency_chk.isChecked == true) {
+                                        if(data_list[2] == "01"){
+                                            beacon!!.add(
+                                                0,
+                                                Beacon(
+                                                    scanResult.getDevice().getAddress(),
+                                                    scanResult.getRssi(),
+                                                    simpleDateFormat.format(Date()),
+                                                    scanRecord!!
+                                                )
+                                            )
+                                        }
+                                    }
+                                    // 사고 / 공사 알림만 수신
+                                    if(accident_chk.isChecked == true){
+                                        if(data_list[2] == "03" || data_list[2] == "04"){
+                                            beacon!!.add(
+                                                0,
+                                                Beacon(
+                                                    scanResult.getDevice().getAddress(),
+                                                    scanResult.getRssi(),
+                                                    simpleDateFormat.format(Date()),
+                                                    scanRecord!!
+                                                )
+                                            )
+                                        }
+                                    }
+
+                                    // 끼어들기 / 커브길 알림만 수신
+                                    if(etc_check.isChecked == true) {
+                                        if(data_list[2] == "02" || data_list[2] == "05"){
+                                            beacon!!.add(
+                                                0,
+                                                Beacon(
+                                                    scanResult.getDevice().getAddress(),
+                                                    scanResult.getRssi(),
+                                                    simpleDateFormat.format(Date()),
+                                                    scanRecord!!
+                                                )
+                                            )
+                                        }
+                                    }
+
+
+                                
 
 
                                     // Adapter로 가기 전에 걸러줘야 할 것 같다.
