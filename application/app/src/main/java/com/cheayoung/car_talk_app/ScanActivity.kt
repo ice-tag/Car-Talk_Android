@@ -39,6 +39,9 @@ class ScanActivity : AppCompatActivity() {
         if(intent.hasExtra("sound")) sound_state = intent.getIntExtra("sound",1)
         if(intent.hasExtra("vibrate")) vibrate_state = intent.getIntExtra("vibrate",1)
 
+        if(beacon_object != null){
+
+        }
         ActivityCompat.requestPermissions(
             this, arrayOf<String>(
                 Manifest.permission.ACCESS_FINE_LOCATION,
@@ -82,6 +85,7 @@ class ScanActivity : AppCompatActivity() {
             intent.putExtra("vibrate",vibrate_state)
             intent.putExtra("push",push_state)
             intent.putExtra("sound",sound_state)
+            intent.putExtra("list", beacon_object)
             startActivity(intent)
             finish()
         }
@@ -101,14 +105,16 @@ class ScanActivity : AppCompatActivity() {
             super.onScanResult(callbackType, result)
             try {
                 val scanRecord: ScanRecord? = result.getScanRecord()
-                Log.d("getTxPowerLevel()", scanRecord?.getTxPowerLevel().toString() + "")
-                Log.d(
-                    "onScanResult()",
-                    result.getDevice().getAddress()
-                        .toString() + "\n" + result.getRssi() + "\n" + result.getDevice().getName()
-                            + "\n" + result.getDevice().getBondState() + "\n" + result.getDevice()
-                        .getType()
-                )
+                if(result.getDevice().getAddress().toString() == "B8:27:EB:58:BB:27") {
+                    Log.d(
+                        "onScanResult()",
+                        result.getDevice().getAddress()
+                            .toString() + "\n" + result.getDevice().getName()
+                                + "\n" + result.getDevice()
+                            .getBondState() + "\n" + result.getDevice()
+                            .getType()
+                    )
+                }
                 scanRecord!!.getServiceUuids()
                 val scanResult: ScanResult = result
                 // 4c 00 이후부터 뒤에 00 전까지 mManufacturerSpecificData
@@ -120,11 +126,10 @@ class ScanActivity : AppCompatActivity() {
                         var data_list = uuid_data.split(",")
                         var ran2 = IntRange(0, data_list[0].indexOf("=")-1)
                         var start_data = uuid_data.slice(ran2)
-                        var end_data : String
-                        var case_data : String
+                        var end_data : String = "-1"
+                        var case_data : String = "-1"
                         var car_number10 : String
                         var car_rail: String
-                        var car_number10_one : String
                         try {
                             end_data = data_list[data_list.size - 1].slice(IntRange(1,3))
                             case_data = data_list[2].slice(IntRange(1,1))
@@ -132,14 +137,12 @@ class ScanActivity : AppCompatActivity() {
                             car_rail = data_list[7]
                         }
                         catch(e: Exception){
-                            end_data = "-1"
-                            case_data = "-1"
                             car_number10 = ""
                             car_rail = "-1"
                         }
                         Log.d(
                             "onScan",
-                            start_data + "\n" + end_data + "\n /"
+                            start_data + "\n" + end_data + "\n /"+ case_data +"\n"
                         )
                         if(start_data == "76" && end_data == "-56" && data_list.size == 23) {
                             beacon!!.add(
@@ -162,7 +165,6 @@ class ScanActivity : AppCompatActivity() {
                             beaconAdapter = BeaconAdapter(beacon, layoutInflater)
                             beaconListView?.setAdapter(beaconAdapter)
                             beaconAdapter?.notifyDataSetChanged()
-
                         }
                     }
                 }.start()
