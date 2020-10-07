@@ -1,8 +1,13 @@
 package com.cheayoung.car_talk_app
 
 import android.Manifest
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.le.*
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -12,6 +17,8 @@ import android.widget.ListView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import kotlinx.android.synthetic.main.activity_scan.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -32,6 +39,7 @@ class ScanActivity : AppCompatActivity() {
     var sound_state = 1
     var vibrate_state = 1
     var beacon_object : MutableList<Any>? = null
+    var first_alarm = true
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scan)
@@ -85,18 +93,9 @@ class ScanActivity : AppCompatActivity() {
             intent.putExtra("vibrate",vibrate_state)
             intent.putExtra("push",push_state)
             intent.putExtra("sound",sound_state)
-            intent.putExtra("list", beacon_object)
             startActivity(intent)
             finish()
         }
-    }
-
-    private fun buildAdvertiseData(): AdvertiseData {
-        val dataBuilder: AdvertiseData.Builder = AdvertiseData.Builder()
-        //Define a service UUID according to your needs
-        dataBuilder.addServiceUuid(ParcelUuid(UUID(0x123abcL, -1L)))
-        dataBuilder.setIncludeDeviceName(true)
-        return dataBuilder.build()
     }
 
     var mScanCallback: ScanCallback = object : ScanCallback() {
@@ -105,7 +104,6 @@ class ScanActivity : AppCompatActivity() {
             super.onScanResult(callbackType, result)
             try {
                 val scanRecord: ScanRecord? = result.getScanRecord()
-                if(result.getDevice().getAddress().toString() == "B8:27:EB:58:BB:27") {
                     Log.d(
                         "onScanResult()",
                         result.getDevice().getAddress()
@@ -114,10 +112,8 @@ class ScanActivity : AppCompatActivity() {
                             .getBondState() + "\n" + result.getDevice()
                             .getType()
                     )
-                }
                 scanRecord!!.getServiceUuids()
                 val scanResult: ScanResult = result
-                // 4c 00 이후부터 뒤에 00 전까지 mManufacturerSpecificData
                 Thread {
                     runOnUiThread {
                         val change = scanRecord!!.toString()
@@ -156,15 +152,22 @@ class ScanActivity : AppCompatActivity() {
                                     scanRecord!!
                                 )
                             )
-
-                            // Adapter로 가기 전에 걸러줘야 할 것 같다.
-                            // 조건문 들어가야 되는 곳
-                            // state를 놓아서 경우마다 beacon 사용자 커스텀으로 볼 수 있도록 추가시켜주기
-                            // 알람 들어갈 함수
                             beacon_object?.add(beacon!!)
                             beaconAdapter = BeaconAdapter(beacon, layoutInflater)
                             beaconListView?.setAdapter(beaconAdapter)
                             beaconAdapter?.notifyDataSetChanged()
+                            //추가
+                            if(case_data == "1"){
+                                makeAlarm("주변에 응급차량이 있습니다. 양보 부탁드립니다.", car_number10)
+                            } else if(case_data == "2"){
+                                makeAlarm(car_rail+ " 차선 비워주세요.", car_number10)
+                            }else if(case_data == "3"){
+                                makeAlarm("전방에 사고가 발생했습니다. 조심하세요.", car_number10)
+                            }else if(case_data == "4"){
+                                makeAlarm("주변에 공사 중입니다. 비켜가세요.", car_number10)
+                            }else if(case_data == "5"){
+                                makeAlarm("앞에 차량이 있습니다. 천천히 가세요(비켜주세요)", car_number10)
+                            }
                         }
                     }
                 }.start()
@@ -184,9 +187,45 @@ class ScanActivity : AppCompatActivity() {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        //mBluetoothLeScanner?.stopScan(mScanCallback)
+    private fun makeAlarm(message: String, car_number: String){
+        val NOTIFICATION_ID = 1001;
+        createNotificationChannel(this, NotificationManagerCompat.IMPORTANCE_DEFAULT,
+            false, getString(R.string.app_name), "App notification channel"
+        ) // 1
+
+        val channelId = "$packageName-${getString(R.string.app_name)}" // 2
+        val title =  "Car-Talk"
+        val content = "Car no."+car_number+"\n"+message
+
+        val intent = Intent(baseContext, MainActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        val pendingIntent = PendingIntent.getActivity(baseContext, 0,
+            intent, PendingIntent.FLAG_UPDATE_CURRENT)    // 3
+
+        val builder = NotificationCompat.Builder(this, channelId)  // 4
+        builder.setSmallIcon(R.drawable.robot)    // 5
+        builder.setContentTitle(title)    // 6
+        builder.setContentText(content)    // 7
+        builder.priority = NotificationCompat.PRIORITY_DEFAULT    // 8
+        builder.setAutoCancel(true)   // 9
+        builder.setContentIntent(pendingIntent)   // 10
+        if(vibrate_state == 1) builder.setDefaults(Notification.DEFAULT_VIBRATE) // 진동음이 울리게 하는 것
+        if(sound_state == 1) builder.setDefaults(Notification.DEFAULT_SOUND) // 소리 알람
+        val notificationManager = NotificationManagerCompat.from(this)
+        notificationManager.notify(NOTIFICATION_ID, builder.build())    // 11
+    }
+
+    private fun createNotificationChannel(context: Context, importance: Int, showBadge: Boolean,
+                                          name: String, description: String) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channelId = "${context.packageName}-$name"
+            val channel = NotificationChannel(channelId, name, importance)
+            channel.description = description
+            channel.setShowBadge(showBadge)
+
+            val notificationManager = context.getSystemService(NotificationManager::class.java)
+            notificationManager.createNotificationChannel(channel)
+        }
     }
 
     companion object {

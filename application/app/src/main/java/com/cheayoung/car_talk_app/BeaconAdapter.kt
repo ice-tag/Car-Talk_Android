@@ -1,11 +1,21 @@
 package com.cheayoung.car_talk_app
 
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
+import android.os.Build
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.TextView
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import kotlinx.android.synthetic.main.activity_setting.*
 import java.util.*
 
 class BeaconAdapter(beacons: Vector<Beacon>?, layoutInflater: LayoutInflater) :
@@ -52,7 +62,6 @@ class BeaconAdapter(beacons: Vector<Beacon>?, layoutInflater: LayoutInflater) :
         val change = beacons.get(position).uuid.toString()
         var ran1 = IntRange(change.indexOf("mManufacturerSpecificData")+27, change.indexOf("mServiceData")-4)
         var uuid_data = change.slice(ran1)
-        var data_list = uuid_data.split(",")
         var case_data : String = beacons.get(position).case
         if(case_data == "1"){
             beaconHolder.message?.setText("주변에 응급차량이 있습니다. 양보 부탁드립니다.")
@@ -74,8 +83,6 @@ class BeaconAdapter(beacons: Vector<Beacon>?, layoutInflater: LayoutInflater) :
         var time: TextView? = null
         var message: TextView? = null
         var rail: TextView? = null
-
     }
-
-
 }
+
