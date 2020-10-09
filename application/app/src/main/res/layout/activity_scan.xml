@@ -8,29 +8,17 @@
 
     <ListView
         android:id="@+id/beaconListView"
-        android:layout_width="412dp"
-        android:layout_height="548dp"
+        android:layout_width="386dp"
+        android:layout_height="644dp"
+        android:layout_marginTop="100dp"
         app:layout_constraintBottom_toTopOf="@+id/scan_stop"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.64"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.932" />
+        app:layout_constraintVertical_bias="0.0">
 
-    <Button
-        android:id="@+id/scan_stop"
-        android:layout_width="134dp"
-        android:layout_height="57dp"
-        android:layout_marginStart="60dp"
-        android:layout_marginLeft="60dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginBottom="8dp"
-        android:text="종료하기"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/beaconListView"
-        app:layout_constraintHorizontal_bias="0.976"
-        app:layout_constraintStart_toStartOf="@+id/beaconListView" />
+    </ListView>
 
     <ImageButton
         android:id="@+id/setting"
@@ -60,13 +48,14 @@
         android:id="@+id/emergency_chk"
         android:layout_width="87dp"
         android:layout_height="32dp"
+        android:layout_marginTop="78dp"
         android:text="응급상황"
         app:layout_constraintBottom_toTopOf="@+id/beaconListView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.441"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.871" />
+        app:layout_constraintVertical_bias="1.0" />
 
     <CheckBox
         android:id="@+id/etc_check"
@@ -78,5 +67,18 @@
         android:text="기타"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/setting" />
+
+    <Button
+        android:id="@+id/scan_stop"
+        android:layout_width="200dp"
+        android:layout_height="41dp"
+        android:layout_marginBottom="12dp"
+        android:text="스캐닝 종료하기"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/accident_chk"
+        app:layout_constraintEnd_toStartOf="@+id/setting"
+        app:layout_constraintHorizontal_bias="0.066"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

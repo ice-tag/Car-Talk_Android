@@ -12,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -51,6 +52,7 @@ class BeaconAdapter(beacons: Vector<Beacon>?, layoutInflater: LayoutInflater) :
             beaconHolder.rssi = convertView.findViewById(R.id.rssi)
             beaconHolder.time = convertView.findViewById(R.id.time)
             beaconHolder.message = convertView.findViewById(R.id.message)
+            beaconHolder.image = convertView.findViewById(R.id.iv_profile)
             convertView.setTag(beaconHolder)
         } else {
             beaconHolder = convertView.getTag() as BeaconHolder
@@ -64,9 +66,13 @@ class BeaconAdapter(beacons: Vector<Beacon>?, layoutInflater: LayoutInflater) :
         var uuid_data = change.slice(ran1)
         var case_data : String = beacons.get(position).case
         if(case_data == "1"){
+
             beaconHolder.message?.setText("주변에 응급차량이 있습니다. 양보 부탁드립니다.")
         } else if(case_data == "2"){
             beaconHolder.message?.setText(beacons.get(position).rail+ " 차선 비워주세요.")
+            beaconHolder.image?.setImageResource(R.drawable.robot)
+            //다섯개 버튼색으로 바꾸기 응급 빨강 사고-노랑 끼어들기 - 초촉
+            // 스캔 화면 세개줄
         }else if(case_data == "3"){
             beaconHolder.message?.setText("전방에 사고가 발생했습니다. 조심하세요.")
         }else if(case_data == "4"){
@@ -83,6 +89,7 @@ class BeaconAdapter(beacons: Vector<Beacon>?, layoutInflater: LayoutInflater) :
         var time: TextView? = null
         var message: TextView? = null
         var rail: TextView? = null
+        var image: ImageView? = null
     }
 }
 
