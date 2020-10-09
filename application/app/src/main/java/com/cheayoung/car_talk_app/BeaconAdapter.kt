@@ -1,15 +1,22 @@
 package com.cheayoung.car_talk_app
 
-import android.annotation.SuppressLint
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
 import android.os.Build
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.TextView
-import androidx.annotation.RequiresApi
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import kotlinx.android.synthetic.main.activity_setting.*
 import java.util.*
-
 
 class BeaconAdapter(beacons: Vector<Beacon>?, layoutInflater: LayoutInflater) :
     BaseAdapter() {
@@ -33,49 +40,49 @@ class BeaconAdapter(beacons: Vector<Beacon>?, layoutInflater: LayoutInflater) :
         return 0
     }
 
-
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View? {
         var convertView: View? = convertView
         val beaconHolder: BeaconHolder
         if (convertView == null) {
             beaconHolder = BeaconHolder()
             convertView = layoutInflater.inflate(R.layout.item_beacon, parent, false)
-            beaconHolder.address = convertView.findViewById(R.id.address)
+            beaconHolder.car_number = convertView.findViewById(R.id.car_number)
+            beaconHolder.rail = convertView.findViewById(R.id.rail)
             beaconHolder.rssi = convertView.findViewById(R.id.rssi)
             beaconHolder.time = convertView.findViewById(R.id.time)
-            beaconHolder.uuid = convertView.findViewById(R.id.uuid)
+            beaconHolder.message = convertView.findViewById(R.id.message)
             convertView.setTag(beaconHolder)
         } else {
             beaconHolder = convertView.getTag() as BeaconHolder
         }
-        beaconHolder.time?.setText("시간 :" + beacons.get(position).now)
-        beaconHolder.address?.setText("MAC Addr :" + beacons.get(position).address)
-        beaconHolder.rssi?.setText("RSSI :" + beacons.get(position).rssi.toString() + "dBm")
+        beaconHolder.car_number?.setText( beacons.get(position).car_number)
+        beaconHolder.rail?.setText(beacons.get(position).rail.toString()+" 차선")
+        beaconHolder.time?.setText(beacons.get(position).now)
+        beaconHolder.rssi?.setText("거리 : " + beacons.get(position).rssi.toString() + " dBm")
         val change = beacons.get(position).uuid.toString()
         var ran1 = IntRange(change.indexOf("mManufacturerSpecificData")+27, change.indexOf("mServiceData")-4)
         var uuid_data = change.slice(ran1)
-        var data_list = uuid_data.split(",")
-
-        var ran2 = IntRange(0, data_list[0].indexOf("=")-1)
-        var start_data = uuid_data.slice(ran2)
-        var ran3 = IntRange(0, 3)
-        var end_data : String
-        try {
-            end_data = data_list[data_list.size - 1].slice(ran3)
+        var case_data : String = beacons.get(position).case
+        if(case_data == "1"){
+            beaconHolder.message?.setText("주변에 응급차량이 있습니다. 양보 부탁드립니다.")
+        } else if(case_data == "2"){
+            beaconHolder.message?.setText(beacons.get(position).rail+ " 차선 비워주세요.")
+        }else if(case_data == "3"){
+            beaconHolder.message?.setText("전방에 사고가 발생했습니다. 조심하세요.")
+        }else if(case_data == "4"){
+            beaconHolder.message?.setText("주변에 공사 중입니다. 비켜가세요.")
+        }else if(case_data == "5"){
+            beaconHolder.message?.setText("앞에 차량이 있습니다. 천천히 가세요(비켜주세요)")
         }
-        catch(e: Exception){
-            end_data = "-1"
-        }
-        beaconHolder.uuid?.setText("UUID :" + uuid_data + "\n start : " +start_data+ "\n end : "+ end_data + "\n size : " + data_list.size )
         return convertView
     }
 
     private inner class BeaconHolder {
-        var address: TextView? = null
+        var car_number: TextView? = null
         var rssi: TextView? = null
         var time: TextView? = null
-        var uuid: TextView? = null
+        var message: TextView? = null
+        var rail: TextView? = null
     }
-
-
 }
+

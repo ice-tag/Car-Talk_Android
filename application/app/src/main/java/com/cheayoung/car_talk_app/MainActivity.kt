@@ -15,6 +15,7 @@ class MainActivity : AppCompatActivity() {
         mode_start_button.setOnClickListener {
             val intent = Intent(this, ScanActivity::class.java)// 다음 화면으로 이동
             startActivity(intent)
+            finish()
         }
     }
 }
