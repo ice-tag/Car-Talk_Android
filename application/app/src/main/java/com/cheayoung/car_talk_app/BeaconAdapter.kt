@@ -1,22 +1,11 @@
 package com.cheayoung.car_talk_app
 
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
-import android.content.Context
-import android.content.Intent
-import android.os.Build
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
-import kotlinx.android.synthetic.main.activity_setting.*
 import java.util.*
 
 class BeaconAdapter(beacons: Vector<Beacon>?, layoutInflater: LayoutInflater) :
@@ -58,7 +47,6 @@ class BeaconAdapter(beacons: Vector<Beacon>?, layoutInflater: LayoutInflater) :
             beaconHolder = convertView.getTag() as BeaconHolder
         }
         beaconHolder.car_number?.setText( beacons.get(position).car_number)
-        beaconHolder.rail?.setText(beacons.get(position).rail.toString()+" 차선")
         beaconHolder.time?.setText(beacons.get(position).now)
         beaconHolder.rssi?.setText("RSSI : " + beacons.get(position).rssi.toString() + " dBm")
         val change = beacons.get(position).uuid.toString()
@@ -67,18 +55,23 @@ class BeaconAdapter(beacons: Vector<Beacon>?, layoutInflater: LayoutInflater) :
         if(case_data == "1"){
             beaconHolder.image?.setImageResource(R.drawable.red_bar)
             beaconHolder.message?.setText("주변에 응급차량이 있습니다. 양보 부탁드립니다.")
+            beaconHolder.rail?.setText(beacons.get(position).rail.toString()+" 차선")
         } else if(case_data == "2"){
+            beaconHolder.image?.setImageResource(R.drawable.yellow_bar)
             beaconHolder.message?.setText(beacons.get(position).rail+ " 차선 비워주세요.")
-            beaconHolder.image?.setImageResource(R.drawable.yellow_bar)
+            beaconHolder.rail?.setText(beacons.get(position).rail.toString()+" 차선")
         }else if(case_data == "3"){
-            beaconHolder.message?.setText("전방에 사고가 발생했습니다. 조심하세요.")
             beaconHolder.image?.setImageResource(R.drawable.yellow_bar)
+            beaconHolder.message?.setText("전방에 사고가 발생했습니다. 조심하세요.")
+            beaconHolder.rail?.setText("  ")
         }else if(case_data == "4"){
+            beaconHolder.image?.setImageResource(R.drawable.blue_bar)
             beaconHolder.message?.setText("주변에 공사 중입니다. 비켜가세요.")
-            beaconHolder.image?.setImageResource(R.drawable.blue_bar)
+            beaconHolder.rail?.setText("  ")
         }else if(case_data == "5"){
-            beaconHolder.message?.setText("앞에 차량이 있습니다. 천천히 가세요(비켜주세요)")
             beaconHolder.image?.setImageResource(R.drawable.blue_bar)
+            beaconHolder.message?.setText("앞에 차량이 있습니다. 천천히 가세요(비켜주세요)")
+            beaconHolder.rail?.setText("  ")
         }
         return convertView
     }

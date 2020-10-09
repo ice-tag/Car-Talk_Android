@@ -2,25 +2,23 @@
 package com.cheayoung.car_talk_app
 
 import android.annotation.SuppressLint
-import android.app.ActionBar
 import android.content.Intent
-import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
 import android.widget.CompoundButton
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_setting.*
-
 
 class SettingActivity : AppCompatActivity() {
     @SuppressLint("WrongViewCast")
     override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_setting)
         var push_state :Int = 4
         var sound_state :Int = 1
         var vibrate_state :Int = 1
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_setting)
+        val ab: androidx.appcompat.app.ActionBar? = supportActionBar
+        ab!!.title = "Settings"
         if(intent.hasExtra("push")) push_state = intent.getIntExtra("push", 1)
         if(intent.hasExtra("sound")) sound_state = intent.getIntExtra("sound", 1)
         if(intent.hasExtra("vibrate")) vibrate_state = intent.getIntExtra("vibrate", 1)
@@ -36,9 +34,6 @@ class SettingActivity : AppCompatActivity() {
             button_vibrate.setChecked(true)
             text_vibrate.setTypeface(null, Typeface.BOLD)
         }
-
-        val ab: androidx.appcompat.app.ActionBar? = supportActionBar
-        ab!!.title = "Settings"
 
         button_push_alam.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { buttonView, isChecked -> // 스위치 버튼이 체크되었는지 검사하여 텍스트뷰에 각 경우에 맞게 출력합니다.
             if (isChecked) {

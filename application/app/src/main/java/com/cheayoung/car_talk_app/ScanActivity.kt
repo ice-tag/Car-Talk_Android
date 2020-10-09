@@ -12,7 +12,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.os.ParcelUuid
 import android.util.Log
 import android.widget.ListView
 import androidx.annotation.RequiresApi
@@ -39,7 +38,6 @@ class ScanActivity : AppCompatActivity() {
     var sound_state = 1
     var vibrate_state = 1
     var beacon_object: MutableList<Any>? = null
-    var first_alarm = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,14 +62,12 @@ class ScanActivity : AppCompatActivity() {
         beacon = Vector<Beacon>()
         mScanSettings = ScanSettings.Builder()
         mScanSettings!!.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
-        val scanSettings = mScanSettings!!.build()
         scanFilters = Vector()
         val scanFilter: ScanFilter.Builder = ScanFilter.Builder()
-        scanFilter.setDeviceAddress("00:00:00:00:00:00") //ex) 00:00:00:00:00:00
+        scanFilter.setDeviceAddress("00:00:00:00:00:00")
         val scan: ScanFilter = scanFilter.build()
         (scanFilters as Vector<ScanFilter>).add(scan)
         mBluetoothLeScanner.startScan(mScanCallback)
-
 
         scan_stop.setOnClickListener {
             mBluetoothLeScanner?.stopScan(mScanCallback)
@@ -137,7 +133,6 @@ class ScanActivity : AppCompatActivity() {
                             start_data + "\n" + end_data + "\n /" + case_data + "\n"
                         )
                         if (start_data == "76" && end_data == "-56" && data_list.size == 23) {
-
                             if (emergency_chk.isChecked == true) {
                                 if (case_data == "1") {
                                     beacon!!.add(
@@ -169,7 +164,6 @@ class ScanActivity : AppCompatActivity() {
                                     )
                                 }
                             }
-
                             // 끼어들기 / 커브길 알림만 수신
                             if (etc_check.isChecked == true) {
                                 if (case_data == "2" || case_data == "5") {
@@ -202,7 +196,6 @@ class ScanActivity : AppCompatActivity() {
                                 } else if (case_data == "5") {
                                     makeAlarm("앞에 차량이 있습니다. 천천히 가세요(비켜주세요)", car_number10)
                                 }
-
                             }
                         }
                     }
@@ -228,17 +221,14 @@ class ScanActivity : AppCompatActivity() {
         createNotificationChannel(
             this, NotificationManagerCompat.IMPORTANCE_DEFAULT,
             false, getString(R.string.app_name), "App notification channel"
-        ) // 1
-
-        val channelId = "$packageName-${getString(R.string.app_name)}" // 2
+        )
+        val channelId = "$packageName-${getString(R.string.app_name)}"
         val title = "Car-Talk"
         val content = "Car no." + car_number + "\n" + message
-
         val intent = Intent(baseContext, MainActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         val pendingIntent = PendingIntent.getActivity(baseContext, 0,
             intent, PendingIntent.FLAG_UPDATE_CURRENT)
-
         val builder = NotificationCompat.Builder(this, channelId)
         builder.setSmallIcon(R.drawable.robot)
         builder.setContentTitle(title)
@@ -248,15 +238,14 @@ class ScanActivity : AppCompatActivity() {
         builder.setContentIntent(pendingIntent)
         if(vibrate_state == 1) builder.setDefaults(Notification.DEFAULT_VIBRATE)
         if(sound_state == 1) builder.setDefaults(Notification.DEFAULT_SOUND)
-
         val notificationManager = NotificationManagerCompat.from(this)
         notificationManager.notify(NOTIFICATION_ID, builder.build())
     }
 
     private fun createNotificationChannel(
         context: Context, importance: Int, showBadge: Boolean,
-        name: String, description: String
-    ) {
+        name: String, description: String )
+    {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channelId = "${context.packageName}-$name"
             val channel = NotificationChannel(channelId, name, importance)
@@ -267,20 +256,7 @@ class ScanActivity : AppCompatActivity() {
             notificationManager.createNotificationChannel(channel)
         }
     }
-
     companion object {
         private val PERMISSIONS = 100
     }
-
-/*
-    private fun add_Alarm(car_number: String, message: String) {
-        val style = NotificationCompat.InboxStyle()
-        while (true) {
-            style.addLine("Car no." + car_number + "\n" + message)
-            if (scan_stop.setOnClickListener) {
-                break;
-            }
-        }
-    }
-    */
 }
