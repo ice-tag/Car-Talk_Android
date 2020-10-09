@@ -47,7 +47,10 @@ class ScanActivity : AppCompatActivity() {
         if(intent.hasExtra("push")) push_state = intent.getIntExtra("push",1)
         if(intent.hasExtra("sound")) sound_state = intent.getIntExtra("sound",1)
         if(intent.hasExtra("vibrate")) vibrate_state = intent.getIntExtra("vibrate",1)
-        
+
+        emergency_chk.isChecked = true
+        accident_chk.isChecked = true
+        etc_check.isChecked = true
         ActivityCompat.requestPermissions(
             this, arrayOf<String>(
                 Manifest.permission.ACCESS_FINE_LOCATION,
@@ -96,13 +99,6 @@ class ScanActivity : AppCompatActivity() {
         }
     }
 
-    private fun buildAdvertiseData(): AdvertiseData {
-        val dataBuilder: AdvertiseData.Builder = AdvertiseData.Builder()
-        //Define a service UUID according to your needs
-        dataBuilder.addServiceUuid(ParcelUuid(UUID(0x123abcL, -1L)))
-        dataBuilder.setIncludeDeviceName(true)
-        return dataBuilder.build()
-    }
 
     var mScanCallback: ScanCallback = object : ScanCallback() {
         @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -149,7 +145,7 @@ class ScanActivity : AppCompatActivity() {
                         if(start_data == "76" && end_data == "-56" && data_list.size == 23) {
 
                             if(emergency_chk.isChecked == true) {
-                                        if(case_data == "01"){
+                                        if(case_data == "1"){
                                             beacon!!.add(
                                                 0,
                                                 Beacon(
@@ -165,7 +161,7 @@ class ScanActivity : AppCompatActivity() {
                                     }
                                     // 사고 / 공사 알림만 수신
                                     if(accident_chk.isChecked == true){
-                                        if(data_list[2] == "03" || data_list[2] == "04"){
+                                        if(case_data == "3" || case_data == "4"){
                                             beacon!!.add(
                                                 0,
                                                 Beacon(
@@ -182,7 +178,7 @@ class ScanActivity : AppCompatActivity() {
 
                                     // 끼어들기 / 커브길 알림만 수신
                                     if(etc_check.isChecked == true) {
-                                        if(data_list[2] == "02" || data_list[2] == "05"){
+                                        if(case_data == "2" || case_data == "5"){
                                             beacon!!.add(
                                                 0,
                                                 Beacon(
