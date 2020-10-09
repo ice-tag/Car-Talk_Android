@@ -38,13 +38,12 @@ class ScanActivity : AppCompatActivity() {
     var push_state = 1
     var sound_state = 1
     var vibrate_state = 1
-    var beacon_object : MutableList<Any>? = null
+    var beacon_object: MutableList<Any>? = null
     var first_alarm = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scan)
-
         if(intent.hasExtra("push")) push_state = intent.getIntExtra("push",1)
         if(intent.hasExtra("sound")) sound_state = intent.getIntExtra("sound",1)
         if(intent.hasExtra("vibrate")) vibrate_state = intent.getIntExtra("vibrate",1)
@@ -83,9 +82,9 @@ class ScanActivity : AppCompatActivity() {
 
         setting.setOnClickListener {
             val intent = Intent(this, SettingActivity::class.java)// 다음 화면으로 이동
-            intent.putExtra("vibrate",vibrate_state)
-            intent.putExtra("push",push_state)
-            intent.putExtra("sound",sound_state)
+            intent.putExtra("vibrate", vibrate_state)
+            intent.putExtra("push", push_state)
+            intent.putExtra("sound", sound_state)
             startActivity(intent)
             finish()
         }
@@ -97,97 +96,100 @@ class ScanActivity : AppCompatActivity() {
             super.onScanResult(callbackType, result)
             try {
                 val scanRecord: ScanRecord? = result.getScanRecord()
-                    Log.d(
-                        "onScanResult()",
-                        result.getDevice().getAddress()
-                            .toString() + "\n" + result.getDevice().getName()
-                                + "\n" + result.getDevice()
-                            .getBondState() + "\n" + result.getDevice()
-                            .getType()
-                    )
+                Log.d(
+                    "onScanResult()",
+                    result.getDevice().getAddress()
+                        .toString() + "\n" + result.getDevice().getName()
+                            + "\n" + result.getDevice()
+                        .getBondState() + "\n" + result.getDevice()
+                        .getType()
+                )
                 scanRecord!!.getServiceUuids()
                 val scanResult: ScanResult = result
                 Thread {
                     runOnUiThread {
                         val change = scanRecord!!.toString()
-                        var ran1 = IntRange(change.indexOf("mManufacturerSpecificData")+27, change.indexOf("mServiceData")-4)
+                        var ran1 = IntRange(
+                            change.indexOf("mManufacturerSpecificData") + 27,
+                            change.indexOf("mServiceData") - 4
+                        )
                         var uuid_data = change.slice(ran1)
                         var data_list = uuid_data.split(",")
-                        var ran2 = IntRange(0, data_list[0].indexOf("=")-1)
+                        var ran2 = IntRange(0, data_list[0].indexOf("=") - 1)
                         var start_data = uuid_data.slice(ran2)
-                        var end_data : String = "-1"
-                        var case_data : String = "-1"
-                        var car_number10 : String
+                        var end_data: String = "-1"
+                        var case_data: String = "-1"
+                        var car_number10: String
                         var car_rail: String
                         try {
-                            end_data = data_list[data_list.size - 1].slice(IntRange(1,3))
-                            case_data = data_list[2].slice(IntRange(1,1))
-                            car_number10 = Integer.toHexString(data_list[4].slice(IntRange(1,2)).toInt())+Integer.toHexString(data_list[5].slice(IntRange(1,2)).toInt())
+                            end_data = data_list[data_list.size - 1].slice(IntRange(1, 3))
+                            case_data = data_list[2].slice(IntRange(1, 1))
+                            car_number10 = Integer.toHexString(
+                                data_list[4].slice(IntRange(1, 2)).toInt()
+                            ) + Integer.toHexString(data_list[5].slice(IntRange(1, 2)).toInt())
                             car_rail = data_list[7]
-                        }
-                        catch(e: Exception){
+                        } catch (e: Exception) {
                             car_number10 = ""
                             car_rail = "-1"
                         }
                         Log.d(
                             "onScan",
-                            start_data + "\n" + end_data + "\n /"+ case_data +"\n"
+                            start_data + "\n" + end_data + "\n /" + case_data + "\n"
                         )
-                        if(start_data == "76" && end_data == "-56" && data_list.size == 23) {
+                        if (start_data == "76" && end_data == "-56" && data_list.size == 23) {
 
-                            if(emergency_chk.isChecked == true) {
-                                        if(case_data == "1"){
-                                            beacon!!.add(
-                                                0,
-                                                Beacon(
-                                                    car_number10,
-                                                    case_data,
-                                                    car_rail,                                    
-                                                    scanResult.getRssi(),                                   
-                                                    simpleDateFormat.format(Date()),                                    
-                                                    scanRecord!!
-                                                    )
-                                                )
-                                        }
-                                    }
-                                    // 사고 / 공사 알림만 수신
-                                    if(accident_chk.isChecked == true){
-                                        if(case_data == "3" || case_data == "4"){
-                                            beacon!!.add(
-                                                0,
-                                                Beacon(
-                                                    car_number10,
-                                                    case_data,
-                                                    car_rail,                                    
-                                                    scanResult.getRssi(),                                   
-                                                    simpleDateFormat.format(Date()),                                    
-                                                    scanRecord!!
-                                                    )
-                                                )
-                                        }
-                                    }
+                            if (emergency_chk.isChecked == true) {
+                                if (case_data == "1") {
+                                    beacon!!.add(
+                                        0,
+                                        Beacon(
+                                            car_number10,
+                                            case_data,
+                                            car_rail,
+                                            scanResult.getRssi(),
+                                            simpleDateFormat.format(Date()),
+                                            scanRecord!!
+                                        )
+                                    )
+                                }
+                            }
+                            // 사고 / 공사 알림만 수신
+                            if (accident_chk.isChecked == true) {
+                                if (case_data == "3" || case_data == "4") {
+                                    beacon!!.add(
+                                        0,
+                                        Beacon(
+                                            car_number10,
+                                            case_data,
+                                            car_rail,
+                                            scanResult.getRssi(),
+                                            simpleDateFormat.format(Date()),
+                                            scanRecord!!
+                                        )
+                                    )
+                                }
+                            }
 
-                                    // 끼어들기 / 커브길 알림만 수신
-                                    if(etc_check.isChecked == true) {
-                                        if(case_data == "2" || case_data == "5"){
-                                            beacon!!.add(
-                                                0,
-                                                Beacon(
-                                                    car_number10,
-                                                    case_data,
-                                                    car_rail,                                    
-                                                    scanResult.getRssi(),                                   
-                                                    simpleDateFormat.format(Date()),                                    
-                                                    scanRecord!!
-                                                    )
-                                                )
-                                        }
-                                    }
+                            // 끼어들기 / 커브길 알림만 수신
+                            if (etc_check.isChecked == true) {
+                                if (case_data == "2" || case_data == "5") {
+                                    beacon!!.add(
+                                        0,
+                                        Beacon(
+                                            car_number10,
+                                            case_data,
+                                            car_rail,
+                                            scanResult.getRssi(),
+                                            simpleDateFormat.format(Date()),
+                                            scanRecord!!
+                                        )
+                                    )
+                                }
+                            }
                             beacon_object?.add(beacon!!)
                             beaconAdapter = BeaconAdapter(beacon, layoutInflater)
                             beaconListView?.setAdapter(beaconAdapter)
                             beaconAdapter?.notifyDataSetChanged()
-                            //추가
                             if(push_state == 1) {
                                 if (case_data == "1") {
                                     makeAlarm("주변에 응급차량이 있습니다. 양보 부탁드립니다.", car_number10)
@@ -200,6 +202,7 @@ class ScanActivity : AppCompatActivity() {
                                 } else if (case_data == "5") {
                                     makeAlarm("앞에 차량이 있습니다. 천천히 가세요(비켜주세요)", car_number10)
                                 }
+
                             }
                         }
                     }
@@ -220,15 +223,16 @@ class ScanActivity : AppCompatActivity() {
         }
     }
 
-    private fun makeAlarm(message: String, car_number: String){
+    private fun makeAlarm(message: String, car_number: String) {
         val NOTIFICATION_ID = 1001;
-        createNotificationChannel(this, NotificationManagerCompat.IMPORTANCE_DEFAULT,
+        createNotificationChannel(
+            this, NotificationManagerCompat.IMPORTANCE_DEFAULT,
             false, getString(R.string.app_name), "App notification channel"
         ) // 1
 
         val channelId = "$packageName-${getString(R.string.app_name)}" // 2
-        val title =  "Car-Talk"
-        val content = "Car no."+car_number+"\n"+message
+        val title = "Car-Talk"
+        val content = "Car no." + car_number + "\n" + message
 
         val intent = Intent(baseContext, MainActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -244,12 +248,15 @@ class ScanActivity : AppCompatActivity() {
         builder.setContentIntent(pendingIntent)
         if(vibrate_state == 1) builder.setDefaults(Notification.DEFAULT_VIBRATE)
         if(sound_state == 1) builder.setDefaults(Notification.DEFAULT_SOUND)
+
         val notificationManager = NotificationManagerCompat.from(this)
         notificationManager.notify(NOTIFICATION_ID, builder.build())
     }
 
-    private fun createNotificationChannel(context: Context, importance: Int, showBadge: Boolean,
-                                          name: String, description: String) {
+    private fun createNotificationChannel(
+        context: Context, importance: Int, showBadge: Boolean,
+        name: String, description: String
+    ) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channelId = "${context.packageName}-$name"
             val channel = NotificationChannel(channelId, name, importance)
@@ -264,4 +271,16 @@ class ScanActivity : AppCompatActivity() {
     companion object {
         private val PERMISSIONS = 100
     }
+
+/*
+    private fun add_Alarm(car_number: String, message: String) {
+        val style = NotificationCompat.InboxStyle()
+        while (true) {
+            style.addLine("Car no." + car_number + "\n" + message)
+            if (scan_stop.setOnClickListener) {
+                break;
+            }
+        }
+    }
+    */
 }
