@@ -60,25 +60,25 @@ class BeaconAdapter(beacons: Vector<Beacon>?, layoutInflater: LayoutInflater) :
         beaconHolder.car_number?.setText( beacons.get(position).car_number)
         beaconHolder.rail?.setText(beacons.get(position).rail.toString()+" 차선")
         beaconHolder.time?.setText(beacons.get(position).now)
-        beaconHolder.rssi?.setText("거리 : " + beacons.get(position).rssi.toString() + " dBm")
+        beaconHolder.rssi?.setText("RSSI : " + beacons.get(position).rssi.toString() + " dBm")
         val change = beacons.get(position).uuid.toString()
         var ran1 = IntRange(change.indexOf("mManufacturerSpecificData")+27, change.indexOf("mServiceData")-4)
-        var uuid_data = change.slice(ran1)
         var case_data : String = beacons.get(position).case
         if(case_data == "1"){
-
+            beaconHolder.image?.setImageResource(R.drawable.red_bar)
             beaconHolder.message?.setText("주변에 응급차량이 있습니다. 양보 부탁드립니다.")
         } else if(case_data == "2"){
             beaconHolder.message?.setText(beacons.get(position).rail+ " 차선 비워주세요.")
-            beaconHolder.image?.setImageResource(R.drawable.robot)
-            //다섯개 버튼색으로 바꾸기 응급 빨강 사고-노랑 끼어들기 - 초촉
-            // 스캔 화면 세개줄
+            beaconHolder.image?.setImageResource(R.drawable.yellow_bar)
         }else if(case_data == "3"){
             beaconHolder.message?.setText("전방에 사고가 발생했습니다. 조심하세요.")
+            beaconHolder.image?.setImageResource(R.drawable.yellow_bar)
         }else if(case_data == "4"){
             beaconHolder.message?.setText("주변에 공사 중입니다. 비켜가세요.")
+            beaconHolder.image?.setImageResource(R.drawable.blue_bar)
         }else if(case_data == "5"){
             beaconHolder.message?.setText("앞에 차량이 있습니다. 천천히 가세요(비켜주세요)")
+            beaconHolder.image?.setImageResource(R.drawable.blue_bar)
         }
         return convertView
     }
