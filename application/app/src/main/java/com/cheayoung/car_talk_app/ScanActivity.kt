@@ -1,3 +1,4 @@
+
 package com.cheayoung.car_talk_app
 
 import android.Manifest
@@ -23,7 +24,6 @@ import kotlinx.android.synthetic.main.activity_scan.*
 import java.text.SimpleDateFormat
 import java.util.*
 
-
 @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 class ScanActivity : AppCompatActivity() {
     var mBluetoothAdapter: BluetoothAdapter? = null
@@ -40,16 +40,14 @@ class ScanActivity : AppCompatActivity() {
     var vibrate_state = 1
     var beacon_object : MutableList<Any>? = null
     var first_alarm = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scan)
         if(intent.hasExtra("push")) push_state = intent.getIntExtra("push",1)
         if(intent.hasExtra("sound")) sound_state = intent.getIntExtra("sound",1)
         if(intent.hasExtra("vibrate")) vibrate_state = intent.getIntExtra("vibrate",1)
-
-        if(beacon_object != null){
-
-        }
+        
         ActivityCompat.requestPermissions(
             this, arrayOf<String>(
                 Manifest.permission.ACCESS_FINE_LOCATION,
@@ -98,6 +96,14 @@ class ScanActivity : AppCompatActivity() {
         }
     }
 
+    private fun buildAdvertiseData(): AdvertiseData {
+        val dataBuilder: AdvertiseData.Builder = AdvertiseData.Builder()
+        //Define a service UUID according to your needs
+        dataBuilder.addServiceUuid(ParcelUuid(UUID(0x123abcL, -1L)))
+        dataBuilder.setIncludeDeviceName(true)
+        return dataBuilder.build()
+    }
+
     var mScanCallback: ScanCallback = object : ScanCallback() {
         @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
         override fun onScanResult(callbackType: Int, result: ScanResult) {
@@ -141,17 +147,55 @@ class ScanActivity : AppCompatActivity() {
                             start_data + "\n" + end_data + "\n /"+ case_data +"\n"
                         )
                         if(start_data == "76" && end_data == "-56" && data_list.size == 23) {
-                            beacon!!.add(
-                                0,
-                                Beacon(
-                                    car_number10,
-                                    case_data,
-                                    car_rail,
-                                    scanResult.getRssi(),
-                                    simpleDateFormat.format(Date()),
-                                    scanRecord!!
-                                )
-                            )
+
+                            if(emergency_chk.isChecked == true) {
+                                        if(case_data == "01"){
+                                            beacon!!.add(
+                                                0,
+                                                Beacon(
+                                                    car_number10,
+                                                    case_data,
+                                                    car_rail,                                    
+                                                    scanResult.getRssi(),                                   
+                                                    simpleDateFormat.format(Date()),                                    
+                                                    scanRecord!!
+                                                    )
+                                                )
+                                        }
+                                    }
+                                    // 사고 / 공사 알림만 수신
+                                    if(accident_chk.isChecked == true){
+                                        if(data_list[2] == "03" || data_list[2] == "04"){
+                                            beacon!!.add(
+                                                0,
+                                                Beacon(
+                                                    car_number10,
+                                                    case_data,
+                                                    car_rail,                                    
+                                                    scanResult.getRssi(),                                   
+                                                    simpleDateFormat.format(Date()),                                    
+                                                    scanRecord!!
+                                                    )
+                                                )
+                                        }
+                                    }
+
+                                    // 끼어들기 / 커브길 알림만 수신
+                                    if(etc_check.isChecked == true) {
+                                        if(data_list[2] == "02" || data_list[2] == "05"){
+                                            beacon!!.add(
+                                                0,
+                                                Beacon(
+                                                    car_number10,
+                                                    case_data,
+                                                    car_rail,                                    
+                                                    scanResult.getRssi(),                                   
+                                                    simpleDateFormat.format(Date()),                                    
+                                                    scanRecord!!
+                                                    )
+                                                )
+                                        }
+                                    }
                             beacon_object?.add(beacon!!)
                             beaconAdapter = BeaconAdapter(beacon, layoutInflater)
                             beaconListView?.setAdapter(beaconAdapter)

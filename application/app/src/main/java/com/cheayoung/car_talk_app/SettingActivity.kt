@@ -1,3 +1,4 @@
+
 package com.cheayoung.car_talk_app
 
 import android.annotation.SuppressLint
@@ -16,6 +17,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.kyleduo.switchbutton.SwitchButton
 import kotlinx.android.synthetic.main.activity_setting.*
+package com.cheayoung.car_talk_app
 
 
 class SettingActivity : AppCompatActivity() {
