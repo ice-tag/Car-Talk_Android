@@ -57,7 +57,7 @@ class BeaconAdapter(beacons: Vector<Beacon>?, layoutInflater: LayoutInflater) :
             beaconHolder.message?.setText("주변에 응급차량이 있습니다. 양보 부탁드립니다.")
             beaconHolder.rail?.setText(beacons.get(position).rail.toString()+" 차선")
         } else if(case_data == "2"){
-            beaconHolder.image?.setImageResource(R.drawable.yellow_bar)
+            beaconHolder.image?.setImageResource(R.drawable.blue_bar)
             beaconHolder.message?.setText(beacons.get(position).rail+ " 차선 비워주세요.")
             beaconHolder.rail?.setText(beacons.get(position).rail.toString()+" 차선")
         }else if(case_data == "3"){
@@ -65,7 +65,7 @@ class BeaconAdapter(beacons: Vector<Beacon>?, layoutInflater: LayoutInflater) :
             beaconHolder.message?.setText("전방에 사고가 발생했습니다. 조심하세요.")
             beaconHolder.rail?.setText("  ")
         }else if(case_data == "4"){
-            beaconHolder.image?.setImageResource(R.drawable.blue_bar)
+            beaconHolder.image?.setImageResource(R.drawable.yellow_bar)
             beaconHolder.message?.setText("주변에 공사 중입니다. 비켜가세요.")
             beaconHolder.rail?.setText("  ")
         }else if(case_data == "5"){
