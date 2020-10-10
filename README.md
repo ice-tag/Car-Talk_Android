@@ -13,9 +13,9 @@
 &nbsp; 이 경우 사용자가 직접 차선을 입력해야한다.<br>
 * 알림내용 <br>
 &nbsp; 송신된 번호에 따라 차등하여 메시지를 수신함 <br>
-
+<center>
 <img src = "application\message.PNG" width = "800" height = "200" alt = "messge contents">
-
+</center>
 * 시간(우측 하단에 표시) 
 * 알림 삭제(우측 상단에 표시)<br><br>
 
